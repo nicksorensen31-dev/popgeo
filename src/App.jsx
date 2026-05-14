@@ -106,6 +106,28 @@ function buildShareText(questions, scores) {
   const total = scores.reduce((a,b) => a+b, 0);
   return `🎬 PopGeo — ${d}\n${scores.map(scoreEmoji).join("  ")}\n${total.toLocaleString()} / 5,000\npopgeo.app`;
 }
+
+async function shareResult(text, setShareText, setCopied) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ text });
+      return;
+    } catch(e) {
+      if (e.name === "AbortError") return; // user cancelled
+    }
+  }
+  // Fallback: clipboard
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+      return;
+    } catch(e) {}
+  }
+  // Last resort: show modal
+  setShareText(text);
+}
 function getTodayKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
 function loadStreak() {
   try { return JSON.parse(localStorage.getItem("popgeo_streak") || "{}") || { count:0, last:"" }; }
@@ -184,7 +206,7 @@ function Globe({ onPick, disabled, guess, answer, showAnswer }) {
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
+      style: "mapbox://styles/mapbox/satellite-v9",
       projection: "globe",
       center: [-98, 38],
       zoom: 2.8,
@@ -202,8 +224,7 @@ function Globe({ onPick, disabled, guess, answer, showAnswer }) {
         "space-color": "rgb(4,11,24)",
         "star-intensity": 0.6,
       });
-      const hide = ["country-label","state-label","settlement-label","settlement-subdivision-label","airport-label","poi-label","water-point-label","water-line-label","natural-point-label","natural-line-label","waterway-label","road-label-simple"];
-      hide.forEach(id => { try { map.setLayoutProperty(id,"visibility","none"); } catch(e){} });
+
       map.addSource("line-src", { type:"geojson", data:{ type:"Feature", geometry:{ type:"LineString", coordinates:[] } } });
       map.addLayer({ id:"guess-line", type:"line", source:"line-src", layout:{"line-join":"round","line-cap":"round"}, paint:{"line-color":"#fde047","line-width":2.5,"line-dasharray":[2,2],"line-opacity":0.9} });
     });
@@ -246,8 +267,7 @@ function Globe({ onPick, disabled, guess, answer, showAnswer }) {
     if (map.getSource("line-src") && guess) {
       map.getSource("line-src").setData({ type:"Feature", geometry:{ type:"LineString", coordinates:[[guess.lng,guess.lat],[answer.lng,answer.lat]] } });
     }
-    const show = ["country-label","state-label","settlement-label"];
-    show.forEach(id => { try { map.setLayoutProperty(id,"visibility","visible"); } catch(e){} });
+
     if (guess) {
       const bounds = new mapboxgl.LngLatBounds().extend([guess.lng,guess.lat]).extend([answer.lng,answer.lat]);
       map.fitBounds(bounds, { padding:100, maxZoom:6, duration:1200 });
@@ -305,9 +325,7 @@ export default function PopGeo() {
 
   const handleShare = () => {
     const text = buildShareText(questions, scores);
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(()=>setCopied(false),2200); }).catch(()=>setShareText(text));
-    } else { setShareText(text); }
+    shareResult(text, setShareText, setCopied);
   };
 
   const feedback   = confirmed ? getFeedback(dists[dists.length-1]) : null;
@@ -402,7 +420,7 @@ export default function PopGeo() {
 
         <div style={{ fontSize:24, letterSpacing:8, textAlign:"center", marginBottom:20 }}>{scores.map(scoreEmoji).join("")}</div>
         <button onClick={handleShare} style={{ width:"100%", padding:14, borderRadius:10, fontSize:15, fontWeight:600, cursor:"pointer", background:copied?"#166534":"#1d4ed8", color:"#fff", border:"none", marginBottom:8 }}>
-          {copied?"✓ Copied!":"Share Result"}
+          {copied ? "✓ Copied!" : "📲 Share Result"}
         </button>
         <div style={{ textAlign:"center", color:"#1e3a5f", fontSize:12, marginTop:8 }}>Come back tomorrow for a new round</div>
       </div>
@@ -433,13 +451,15 @@ export default function PopGeo() {
         </div>
 
         {/* Question type badge */}
-        <div style={{ display:"inline-block", background:meta.bg, border:`1px solid ${meta.border}`, borderRadius:20, padding:"3px 12px", fontSize:11, color:meta.color, fontFamily:"monospace", letterSpacing:"0.04em", marginBottom:8 }}>
+        <div style={{ display:"inline-block", background:"rgba(4,11,24,0.75)", border:`1px solid ${meta.border}`, borderRadius:20, padding:"3px 12px", fontSize:11, color:meta.color, fontFamily:"monospace", letterSpacing:"0.04em", marginBottom:6, backdropFilter:"blur(8px)" }}>
           {q.emoji} {meta.label}
         </div>
 
         {/* Clue */}
-        <div style={{ fontSize:15, lineHeight:1.5, color:"#e2e8f0", fontStyle:"italic", textShadow:"0 1px 4px rgba(0,0,0,0.8)" }}>
-          "{q.clue}"
+        <div style={{ background:"rgba(4,11,24,0.82)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"10px 14px", marginTop:4 }}>
+          <div style={{ fontSize:14, lineHeight:1.55, color:"#e2e8f0", fontStyle:"italic" }}>
+            "{q.clue}"
+          </div>
         </div>
       </div>
 
