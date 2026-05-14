@@ -129,12 +129,13 @@ function loadUnit() { try { return localStorage.getItem("popgeo_unit") || "mi"; 
 function saveUnit(u) { try { localStorage.setItem("popgeo_unit", u); } catch {} }
 
 function calcScore(d) {
-  if (d < 50) return 1000;
+  const mi = d * 0.621371;
+  if (mi < 15) return 1000;
   return Math.max(0, Math.round(1000 * Math.exp(-d / 2000)));
 }
 
 const FEEDBACK_TIERS = [
-  { max: 50,       color: "#22c55e", labels: ["Perfect! 🎯", "Bullseye! 🎯", "Nailed it! 🎯", "Right on the money! 💰"] },
+  { max: 15,       color: "#22c55e", labels: ["Perfect! 🎯", "Bullseye! 🎯", "Nailed it! 🎯", "Right on the money! 💰"] },
   { max: 200,      color: "#22c55e", labels: ["Outstanding! 🔥", "Excellent! 🔥", "So close! 🔥", "Almost exact! 💪"] },
   { max: 500,      color: "#84cc16", labels: ["Great! 👏", "Nice one! 👏", "Solid guess! 👌", "Pretty close! 👌"] },
   { max: 1000,     color: "#f59e0b", labels: ["Not bad!", "Could be worse!", "Room to improve 🤔", "Getting warmer 🌡️"] },
