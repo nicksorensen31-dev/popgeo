@@ -198,7 +198,7 @@ function SettingsPanel({ unit, onUnitChange, onClose }) {
 }
 
 // ── Mapbox Globe ──────────────────────────────────────────────────────────────
-function Globe({ onPick, disabled, guess, answer, showAnswer }) {
+function Globe({ onPick, disabled, guess, answer, showAnswer, onMapReady }) {
   const mapRef       = useRef(null);
   const containerRef = useRef(null);
   const markersRef   = useRef({ guess: null, answer: null });
@@ -217,6 +217,7 @@ function Globe({ onPick, disabled, guess, answer, showAnswer }) {
     mapRef.current = map;
 
     map.on("load", () => {
+      if (onMapReady) onMapReady(map);
       // Hide text labels only — keep country/state border lines visible
       const textLayers = [
         "country-label","state-label","settlement-label",
@@ -313,6 +314,7 @@ export default function PopGeo() {
   const [unit, setUnit]       = useState(() => loadUnit());
   const [showSettings, setShowSettings] = useState(false);
   const [shareText, setShareText]       = useState(null);
+  const mapInstanceRef = useRef(null);
 
   useEffect(() => {
     document.body.style.cssText = "margin:0;padding:0;background:#040b18;overflow:hidden;";
@@ -340,8 +342,15 @@ export default function PopGeo() {
   }, [guess, confirmed, q]);
 
   const handleNext = () => {
-    if (qIdx < questions.length-1) { setQIdx(i=>i+1); setGuess(null); setConf(false); }
-    else { setStreak(updateStreak()); setPhase("done"); }
+    if (qIdx < questions.length-1) {
+      setQIdx(i=>i+1); setGuess(null); setConf(false);
+      // Fly back to USA for next question
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo({ center:[-98, 38], zoom:2.8, duration:1000, essential:true });
+      }
+    } else {
+      setStreak(updateStreak()); setPhase("done");
+    }
   };
 
   const handleShare = () => {
@@ -456,7 +465,8 @@ export default function PopGeo() {
 
       {/* Full screen globe */}
       <Globe onPick={handlePick} disabled={confirmed} guess={guess}
-        answer={confirmed?{lat:q.lat,lng:q.lng}:null} showAnswer={confirmed}/>
+        answer={confirmed?{lat:q.lat,lng:q.lng}:null} showAnswer={confirmed}
+        onMapReady={map => { mapInstanceRef.current = map; }}/>
 
       {/* Top header bar — collapses after guess */}
       <div style={{ position:"absolute", top:0, left:0, right:0, padding:"50px 16px 12px", background:"linear-gradient(to bottom,rgba(4,11,24,0.92) 0%,rgba(4,11,24,0) 100%)", pointerEvents:"none", transition:"opacity 0.4s ease, transform 0.4s ease", opacity:confirmed?0:1, transform:confirmed?"translateY(-20px)":"translateY(0)", pointerEvents:confirmed?"none":"all" }}>
