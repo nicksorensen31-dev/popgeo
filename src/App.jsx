@@ -505,10 +505,11 @@ export default function PopGeo() {
             <div style={{ color:"#475569", fontSize:12, marginBottom:12 }}>{formatDist(lastDist,unit)} from the answer</div>
 
             {/* Answer blurb */}
-            <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:10, padding:"10px 14px", marginBottom:14 }}>
-              <div style={{ color:"#334155", fontSize:10, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:4 }}>Answer</div>
-              <div style={{ color:"#e2e8f0", fontSize:15, fontWeight:600, marginBottom:4 }}>{q.answer}</div>
-              <div style={{ color:"#475569", fontSize:12, lineHeight:1.5 }}>{q.blurb}</div>
+            <div style={{ background:"rgba(4,11,24,0.85)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:12, padding:"12px 16px", marginBottom:14 }}>
+              <div style={{ color:"#475569", fontSize:10, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:6 }}>Answer</div>
+              <div style={{ color:"#f1f5f9", fontSize:17, fontWeight:700, marginBottom:6, letterSpacing:"-0.01em" }}>{q.answer}</div>
+              <div style={{ width:32, height:2, background:"linear-gradient(90deg,#3b82f6,#22c55e)", borderRadius:2, marginBottom:8 }}/>
+              <div style={{ color:"#94a3b8", fontSize:13, lineHeight:1.65, fontWeight:400 }}>{q.blurb}</div>
             </div>
 
             <button onClick={handleNext} style={{ width:"100%", padding:14, borderRadius:10, fontSize:15, fontWeight:700, background:"#166534", color:"#fff", border:"1px solid #22c55e", cursor:"pointer" }}>
