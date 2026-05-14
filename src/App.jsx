@@ -449,8 +449,8 @@ export default function PopGeo() {
       <Globe onPick={handlePick} disabled={confirmed} guess={guess}
         answer={confirmed?{lat:q.lat,lng:q.lng}:null} showAnswer={confirmed}/>
 
-      {/* Top header bar */}
-      <div style={{ position:"absolute", top:0, left:0, right:0, padding:"50px 16px 12px", background:"linear-gradient(to bottom,rgba(4,11,24,0.92) 0%,rgba(4,11,24,0) 100%)", pointerEvents:"none" }}>
+      {/* Top header bar — collapses after guess */}
+      <div style={{ position:"absolute", top:0, left:0, right:0, padding:"50px 16px 12px", background:"linear-gradient(to bottom,rgba(4,11,24,0.92) 0%,rgba(4,11,24,0) 100%)", pointerEvents:"none", transition:"opacity 0.4s ease, transform 0.4s ease", opacity:confirmed?0:1, transform:confirmed?"translateY(-20px)":"translateY(0)", pointerEvents:confirmed?"none":"all" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
           <div style={{ fontSize:20, fontWeight:800, background:"linear-gradient(135deg,#60a5fa,#34d399)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>PopGeo</div>
           <div style={{ display:"flex", alignItems:"center", gap:10, pointerEvents:"all" }}>
@@ -474,6 +474,22 @@ export default function PopGeo() {
           </div>
         </div>
       </div>
+
+      {/* Minimal post-guess top bar — shows after answer */}
+      {confirmed && (
+        <div style={{ position:"absolute", top:0, left:0, right:0, padding:"50px 16px 10px", background:"linear-gradient(to bottom,rgba(4,11,24,0.85) 0%,rgba(4,11,24,0) 100%)", pointerEvents:"none", transition:"opacity 0.4s ease", opacity:1 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div style={{ fontSize:18, fontWeight:800, background:"linear-gradient(135deg,#60a5fa,#34d399)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>PopGeo</div>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <div style={{ display:"flex", gap:4 }}>
+                {questions.map((_,i) => <div key={i} style={{ width:20, height:3, borderRadius:2, background:i<qIdx?"#22c55e":i===qIdx?"#3b82f6":"rgba(255,255,255,0.1)" }}/>)}
+              </div>
+              <span style={{ color:"#334155", fontSize:11 }}>{qIdx+1}/5</span>
+              <button onClick={()=>setShowSettings(true)} style={{ background:"none", border:"none", color:"#334155", fontSize:15, cursor:"pointer", pointerEvents:"all" }}>⚙</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom panel — hint or result */}
       <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"linear-gradient(to top,rgba(4,11,24,0.97) 60%,rgba(4,11,24,0) 100%)", padding:"60px 16px 40px" }}>
