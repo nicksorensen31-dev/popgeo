@@ -206,7 +206,7 @@ function Globe({ onPick, disabled, guess, answer, showAnswer }) {
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: "mapbox://styles/mapbox/satellite-v9",
+      style: "mapbox://styles/mapbox/satellite-streets-v12",
       projection: "globe",
       center: [-98, 38],
       zoom: 2.8,
@@ -217,6 +217,18 @@ function Globe({ onPick, disabled, guess, answer, showAnswer }) {
     mapRef.current = map;
 
     map.on("load", () => {
+      // Hide text labels only — keep country/state border lines visible
+      const textLayers = [
+        "country-label","state-label","settlement-label",
+        "settlement-subdivision-label","airport-label","poi-label",
+        "water-point-label","water-line-label","natural-point-label",
+        "natural-line-label","waterway-label","road-label-simple",
+        "transit-label","road-number-shield"
+      ];
+      textLayers.forEach(id => {
+        try { map.setLayoutProperty(id, "visibility", "none"); } catch(e) {}
+      });
+
       map.setFog({
         color: "rgb(10,20,40)",
         "high-color": "rgb(20,50,100)",
