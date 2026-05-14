@@ -323,15 +323,29 @@ function Globe({ onPick, disabled, guess, answer, showAnswer, onMapReady }) {
   return <div ref={containerRef} style={{ position:"absolute", inset:0 }}/>;
 }
 
+// ── Completed Round Persistence ───────────────────────────────────────────────
+function saveCompletedRound(scores, dists) {
+  try {
+    localStorage.setItem(`popgeo_done_${getTodayKey()}`, JSON.stringify({ scores, dists }));
+  } catch {}
+}
+function loadCompletedRound() {
+  try {
+    const raw = localStorage.getItem(`popgeo_done_${getTodayKey()}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
 // ── App ────────────────────────────────────────────────────────────────────────
 export default function PopGeo() {
   const questions = getDailyQuestions();
+  const prior = loadCompletedRound();
   const [qIdx, setQIdx]       = useState(0);
   const [guess, setGuess]     = useState(null);
   const [confirmed, setConf]  = useState(false);
-  const [scores, setScores]   = useState([]);
-  const [dists, setDists]     = useState([]);
-  const [phase, setPhase]     = useState("landing");
+  const [scores, setScores]   = useState(prior?.scores || []);
+  const [dists, setDists]     = useState(prior?.dists || []);
+  const [phase, setPhase]     = useState(prior ? "done" : "landing");
   const [streak, setStreak]   = useState(() => loadStreak().count);
   const [copied, setCopied]   = useState(false);
   const [unit, setUnit]       = useState(() => loadUnit());
@@ -343,6 +357,12 @@ export default function PopGeo() {
     document.body.style.cssText = "margin:0;padding:0;background:#040b18;overflow:hidden;";
     document.documentElement.style.cssText = "margin:0;padding:0;background:#040b18;height:100%;";
   }, []);
+
+  useEffect(() => {
+    if (phase === "done" && scores.length === 5 && !loadCompletedRound()) {
+      saveCompletedRound(scores, dists);
+    }
+  }, [phase]);
 
   const q    = questions[qIdx];
   const meta = TYPE_META[q?.type] || TYPE_META.filmed;
