@@ -237,6 +237,15 @@ function Globe({ onPick, disabled, guess, answer, showAnswer }) {
         "star-intensity": 0.6,
       });
 
+      // Brighten satellite imagery
+      map.getStyle().layers.forEach(layer => {
+        if (layer.type === "raster") {
+          map.setPaintProperty(layer.id, "raster-brightness-min", 0.15);
+          map.setPaintProperty(layer.id, "raster-brightness-max", 1.0);
+          map.setPaintProperty(layer.id, "raster-saturation", 0.2);
+        }
+      });
+
       map.addSource("line-src", { type:"geojson", data:{ type:"Feature", geometry:{ type:"LineString", coordinates:[] } } });
       map.addLayer({ id:"guess-line", type:"line", source:"line-src", layout:{"line-join":"round","line-cap":"round"}, paint:{"line-color":"#fde047","line-width":2.5,"line-dasharray":[2,2],"line-opacity":0.9} });
     });
