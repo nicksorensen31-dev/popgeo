@@ -384,7 +384,7 @@ export default function PopGeo() {
     if (qIdx < questions.length - 1) {
       // Fly back out to default globe view before next question
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.flyTo({ center: [-30, 20], zoom: 2.8, duration: 1000, essential: true });
+        mapInstanceRef.current.flyTo({ center: [-98, 38], zoom: 2.8, duration: 1000, essential: true });
       }
       setTimeout(() => { setQIdx(i => i + 1); setGuess(null); setConf(false); }, 600);
     } else {
