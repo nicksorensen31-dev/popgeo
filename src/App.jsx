@@ -382,7 +382,11 @@ export default function PopGeo() {
 
   const handleNext = () => {
     if (qIdx < questions.length - 1) {
-      setQIdx(i => i + 1); setGuess(null); setConf(false);
+      // Fly back out to default globe view before next question
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo({ center: [-30, 20], zoom: 2.8, duration: 1000, essential: true });
+      }
+      setTimeout(() => { setQIdx(i => i + 1); setGuess(null); setConf(false); }, 600);
     } else {
       const s = updateStreak(); setStreak(s); setPhase("done");
     }
