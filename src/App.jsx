@@ -213,8 +213,12 @@ function Globe({ onPick, disabled, guess, answer, showAnswer, onMapReady }) {
       minZoom: 1.5,
       maxZoom: 12,
       attributionControl: false,
+      customAttribution: '',
     });
     mapRef.current = map;
+
+    // Add minimal attribution in bottom-left
+    new mapboxgl.AttributionControl({ compact: true }).addTo(map);
 
     map.on("load", () => {
       if (onMapReady) onMapReady(map);
