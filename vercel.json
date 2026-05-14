@@ -1,7 +1,1 @@
-{
-  "functions": {
-    "api/questions.js": {
-      "runtime": "@vercel/node"
-    }
-  }
-}
+{}
