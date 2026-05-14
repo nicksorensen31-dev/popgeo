@@ -165,7 +165,7 @@ const TYPE_META = {
 function buildShareText(questions, scores) {
   const d = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const total = scores.reduce((a, b) => a + b, 0);
-  return `🎬 PopGeo — ${d}\n${scores.map(scoreEmoji).join("  ")}\n${total.toLocaleString()} / 5,000\npopgeo.app`;
+  return `🎬 PopGeo — ${d}\n${scores.map(scoreEmoji).join("  ")}\n${total.toLocaleString()} / 5,000\nhttps://www.popgeo.app`;
 }
 
 async function shareResult(text, setShareText, setCopied) {
