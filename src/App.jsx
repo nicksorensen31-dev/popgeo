@@ -109,13 +109,11 @@ Example of a BAD clue: "Fargo takes place in this frozen upper Midwest city" —
 Another GOOD example (actor): "This Oscar-winning actress grew up on a farm outside a major South African city before moving to New York at 16 to model."
 Another BAD example: "Charlize Theron grew up near this South African city" — BAD because "South African" gives away the continent.`;
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/questions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
+      
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
